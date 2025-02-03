@@ -1,0 +1,233 @@
+{
+ "การทดลอง": {
+ "clash_api": {
+ "ภายนอก_คอนโทรลเลอร์": "",
+ "ความลับ": ""
+    },
+ "ดีบัก": {
+ "max_threads": โมฆะ,
+ "panic_on_fault": เท็จ
+    },
+ "แคช_ไฟล์": {
+ "เปิดใช้งาน": เท็จ,
+ "เส้นทาง": "",
+ "store_fakeip": จริง
+    }
+  },
+ "บันทึก": {
+ "พิการ": เท็จ,
+ "ระดับ": "ข้อมูล",
+ "เอาท์พุต": "",
+ "ประทับเวลา": จริง
+  },
+ "เอ็นทีพี": {
+ "เปิดใช้งาน": เท็จ,
+ "เซิร์ฟเวอร์": "time.windows.com",
+ "เซิร์ฟเวอร์_พอร์ต": 123,
+ "ช่วงเวลา": "12ชม.",
+ "ทางอ้อม": "ตรง_ออก"
+  },
+ "ดีเอ็นเอส": {
+ "สุดท้าย": "dns_final_out",
+ "กลยุทธ์": "ipv4_เท่านั้น",
+ "อิสระ_แคช": จริง,
+ "กฎ": [],
+ "เซิร์ฟเวอร์": [
+      {
+ "แท็ก": "dns_outbound_out",
+ "ที่อยู่": "ท้องถิ่น"
+      },
+      {
+ "แท็ก": "dns_direct_out",
+ "ที่อยู่": "ท้องถิ่น"
+      },
+      {
+ "แท็ก": "dns_proxy_out",
+ "ที่อยู่": "https://1.1.1.1/dns-query",
+ "ที่อยู่_โซลูชั่น": "dns_resolver_out",
+ "ทางอ้อม": "ตรง_ออก"
+      },
+      {
+ "แท็ก": "dns_final_out",
+ "ที่อยู่": "https://1.1.1.1/dns-query",
+ "ที่อยู่_โซลูชั่น": "dns_resolver_out",
+ "ทางอ้อม": "ตัวเลือก_ออก"
+      },
+      {
+ "แท็ก": "dns_resolver_out",
+ "ที่อยู่": "ท้องถิ่น"
+      },
+      {
+        "tag": "dns_local_out",
+        "address": "local",
+        "detour": "direct_out"
+      },
+      {
+        "tag": "dns_block_out",
+        "address": "rcode://success"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed_in_direct",
+      "set_system_proxy": false,
+      "listen": "0.0.0.0",
+      "listen_port": 3065,
+      "sniff": true,
+      "domain_strategy": "ipv4_only"
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed_in_forword",
+      "set_system_proxy": false,
+      "listen": "0.0.0.0",
+      "listen_port": 3066,
+      "sniff": true,
+      "domain_strategy": "ipv4_only"
+    },
+    {
+      "type": "tun",
+      "tag": "tun_in",
+      "interface_name": "Karing TUN Network Adapter",
+      "inet4_address": [
+        "172.19.0.1/30"
+      ],
+      "inet6_address": null,
+      "auto_route": true,
+      "strict_route": false,
+      "stack": "mixed",
+      "platform": {
+        "http_proxy": {
+          "enabled": true,
+          "server": "127.0.0.1",
+          "server_port": 3067
+        }
+      },
+      "include_package": [],
+      "exclude_package": [],
+      "sniff": true,
+      "domain_strategy": "ipv4_only"
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed_in",
+      "set_system_proxy": false,
+      "listen": "0.0.0.0",
+      "listen_port": 3067,
+      "sniff": true,
+      "domain_strategy": "ipv4_only"
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "selector_out",
+      "default": "urltest_out",
+      "interrupt_exist_connections": false,
+      "outbounds": [
+        "urltest_out"
+      ]
+    },
+    {
+      "type": "urltest",
+      "tag": "urltest_out",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "8h",
+      "interrupt_exist_connections": false,
+      "idle_timeout": "8h",
+      "outbounds": [
+        "proxy"
+      ]
+    },
+    {
+      "alter_id": 0,
+      "packet_encoding": "",
+      "security": "auto",
+      "server": "43.229.150.167",
+      "server_port": 8080,
+      "transport": {
+        "headers": {
+          "Host": "ns.tikinternet.com"
+        },
+        "path": "/1IKYjV0r/",
+        "type": "ws"
+      },
+      "uuid": "526bac803bbb09f19a36ea3e424c62c00f72e0e33308ac3e18dd1d3589d53b71",
+      "type": "vmess",
+      "domain_strategy": "ipv6_only",
+      "tag": "proxy"
+    },
+    {
+      "type": "direct",
+      "tag": "direct_out"
+    },
+    {
+      "type": "block",
+      "tag": "block_out"
+    },
+    {
+      "type": "dns",
+      "tag": "dns_out"
+    }
+  ],
+  "route": {
+    "final": "selector_out",
+    "find_process": true,
+    "auto_detect_interface": true,
+    "rules": [
+      {
+        "protocol": [
+          "dns"
+        ],
+        "outbound": "dns_out"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "direct_out"
+      },
+      {
+        "inbound": [
+          "mixed_in_direct"
+        ],
+        "outbound": "direct_out"
+      },
+      {
+        "inbound": [
+          "mixed_in_forword"
+        ],
+        "outbound": "selector_out"
+      },
+      {
+        "domain_suffix": [
+          "ingest.sentry.io",
+          "karing.app",
+          "yacd.metacubex.one"
+        ],
+        "outbound": "direct_out"
+      },
+      {
+        "domain_suffix": [
+          "speed.cloudflare.com"
+        ],
+        "outbound": "selector_out"
+      },
+      {
+        "rule_set": [
+          "geoip:th"
+        ],
+        "outbound": "direct_out"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "geoip:th",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/KaringX/karing-ruleset/raw/sing/geo/geoip/th.srs",
+        "download_detour": "selector_out"
+      }
+    ]
+  }
+}
