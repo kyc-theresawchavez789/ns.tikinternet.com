@@ -1,0 +1,606 @@
+port: 7890
+socks-port: 7891
+redir-port: 7892
+allow-lan: false
+mode: Rule
+log-level: info
+external-controller: 127.0.0.1:9090
+external-ui: folder
+experimental:
+  ignore-resolve-fail: true
+interface-name: en0
+authentication:
+  - "user1:pass1"
+  - "user2:pass2"
+hosts:
+  'mtalk.google.com': 108.177.125.188
+  '*.clash.dev': 127.0.0.1
+  'alpha.clash.dev': '::1'
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:53
+  default-nameserver:
+      - 114.114.114.114
+      - 8.8.8.8
+  enhanced-mode: redir-host
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - localhost.ptlogin2.qq.com
+  nameserver:
+    - 114.114.114.114
+    - tls://dns.rubyfish.cn:853
+    - https://1.1.1.1/dns-query
+  fallback:
+    - tcp://1.1.1.1
+  fallback-filter:
+    geoip: true
+    ipcidr:
+      - 240.0.0.0/4
+proxies:
+  - {name: Select_Vmess, server: www.opensignal.com, port: 80, type: vless, uuid: 6f46962e-2d99-4096-ae33-1aec9ec6eba4, cipher: auto, tls: false, skip-cert-verify: true, servername: www.opensignal.com.m1.txi.cab, network: ws, ws-opts: {path: /vless, headers: {Host: www.opensignal.com.m1.txi.cab}}, udp: true}
+proxy-groups:
+- name: FINAL
+  type: select
+  proxies:
+  - Select_Vmess
+  - Select_Trojan
+  - Auto_Vmess
+  - Auto_Trojan
+  - Auto_All
+  - LoadBalance_Vmess
+  - LoadBalance_Trojan
+  - DIRECT
+
+- name: Select_Vmess
+  type: select
+  use:
+  - Server_Vmess
+
+- name: Select_Trojan
+  type: select
+  use:
+  - Server_Trojan
+
+- name: Auto_Vmess
+  type: url-test
+  tolerance: 100
+  use:
+  - Server_Vmess
+
+- name: Auto_Trojan
+  type: url-test
+  tolerance: 100
+  use:
+  - Server_Trojan  
+
+- name: Auto_All
+  type: url-test
+  tolerance: 100
+  use:
+  - Server_Vmess
+  - Server_Trojan
+
+- name: LoadBalance_Vmess
+  type: load-balance
+  strategy: consistent-hashing
+  disable-udp: false
+  use:
+  - Server_Vmess
+
+- name: LoadBalance_Trojan
+  type: load-balance
+  strategy: consistent-hashing
+  disable-udp: false
+  use:
+  - Server_Trojan
+
+proxy-providers:
+  Server_Vmess:
+    type: file
+    path: ./Server_Vmess.yaml
+    health-check:
+      enable: true
+      interval: 300
+      lazy: true
+      url: 'http://www.gstatic.com/generate_204'
+      
+  Server_Trojan:
+    type: file
+    path: ./Server_Trojan.yaml
+    health-check:
+      enable: true
+      interval: 300
+      lazy: true
+      url: 'http://www.gstatic.com/generate_204'
+
+rule-providers:
+  LAN:
+    behavior: ipcidr
+    type: file
+    path: ./LAN.yaml
+
+rules:
+- DOMAIN-SUFFIX,googletraveladservices.com,DIRECT
+- DOMAIN,dl.google.com,DIRECT
+- DOMAIN,mtalk.google.com,DIRECT
+- DOMAIN-SUFFIX,17gouwuba.com,REJECT
+- DOMAIN-SUFFIX,186078.com,REJECT
+- DOMAIN-SUFFIX,189zj.cn,REJECT
+- DOMAIN-SUFFIX,285680.com,REJECT
+- DOMAIN-SUFFIX,3721zh.com,REJECT
+- DOMAIN-SUFFIX,4336wang.cn,REJECT
+- DOMAIN-SUFFIX,51chumoping.com,REJECT
+- DOMAIN-SUFFIX,51mld.cn,REJECT
+- DOMAIN-SUFFIX,51mypc.cn,REJECT
+- DOMAIN-SUFFIX,58mingri.cn,REJECT
+- DOMAIN-SUFFIX,58mingtian.cn,REJECT
+- DOMAIN-SUFFIX,5vl58stm.com,REJECT
+- DOMAIN-SUFFIX,6d63d3.com,REJECT
+- DOMAIN-SUFFIX,7gg.cc,REJECT
+- DOMAIN-SUFFIX,91veg.com,REJECT
+- DOMAIN-SUFFIX,9s6q.cn,REJECT
+- DOMAIN-SUFFIX,adsame.com,REJECT
+- DOMAIN-SUFFIX,aiclk.com,REJECT
+- DOMAIN-SUFFIX,akuai.top,REJECT
+- DOMAIN-SUFFIX,atplay.cn,REJECT
+- DOMAIN-SUFFIX,baiwanchuangyi.com,REJECT
+- DOMAIN-SUFFIX,beerto.cn,REJECT
+- DOMAIN-SUFFIX,beilamusi.com,REJECT
+- DOMAIN-SUFFIX,benshiw.net,REJECT
+- DOMAIN-SUFFIX,bianxianmao.com,REJECT
+- DOMAIN-SUFFIX,bryonypie.com,REJECT
+- DOMAIN-SUFFIX,cishantao.com,REJECT
+- DOMAIN-SUFFIX,cszlks.com,REJECT
+- DOMAIN-SUFFIX,cudaojia.com,REJECT
+- DOMAIN-SUFFIX,dafapromo.com,REJECT
+- DOMAIN-SUFFIX,daitdai.com,REJECT
+- DOMAIN-SUFFIX,dsaeerf.com,REJECT
+- DOMAIN-SUFFIX,dugesheying.com,REJECT
+- DOMAIN-SUFFIX,dv8c1t.cn,REJECT
+- DOMAIN-SUFFIX,echatu.com,REJECT
+- DOMAIN-SUFFIX,erdoscs.com,REJECT
+- DOMAIN-SUFFIX,fan-yong.com,REJECT
+- DOMAIN-SUFFIX,feih.com.cn,REJECT
+- DOMAIN-SUFFIX,fjlqqc.com,REJECT
+- DOMAIN-SUFFIX,fkku194.com,REJECT
+- DOMAIN-SUFFIX,freedrive.cn,REJECT
+- DOMAIN-SUFFIX,gclick.cn,REJECT
+- DOMAIN-SUFFIX,goufanli100.com,REJECT
+- DOMAIN-SUFFIX,goupaoerdai.com,REJECT
+- DOMAIN-SUFFIX,gouwubang.com,REJECT
+- DOMAIN-SUFFIX,gzxnlk.com,REJECT
+- DOMAIN-SUFFIX,haoshengtoys.com,REJECT
+- DOMAIN-SUFFIX,hyunke.com,REJECT
+- DOMAIN-SUFFIX,ichaosheng.com,REJECT
+- DOMAIN-SUFFIX,ishop789.com,REJECT
+- DOMAIN-SUFFIX,jdkic.com,REJECT
+- DOMAIN-SUFFIX,jiubuhua.com,REJECT
+- DOMAIN-SUFFIX,jsncke.com,REJECT
+- DOMAIN-SUFFIX,junkucm.com,REJECT
+- DOMAIN-SUFFIX,jwg365.cn,REJECT
+- DOMAIN-SUFFIX,kawo77.com,REJECT
+- DOMAIN-SUFFIX,kualianyingxiao.cn,REJECT
+- DOMAIN-SUFFIX,kumihua.com,REJECT
+- DOMAIN-SUFFIX,ltheanine.cn,REJECT
+- DOMAIN-SUFFIX,maipinshangmao.com,REJECT
+- DOMAIN-SUFFIX,minisplat.cn,REJECT
+- DOMAIN-SUFFIX,mkitgfs.com,REJECT
+- DOMAIN-SUFFIX,mlnbike.com,REJECT
+- DOMAIN-SUFFIX,mobjump.com,REJECT
+- DOMAIN-SUFFIX,nbkbgd.cn,REJECT
+- DOMAIN-SUFFIX,newapi.com,REJECT
+- DOMAIN-SUFFIX,pinzhitmall.com,REJECT
+- DOMAIN-SUFFIX,poppyta.com,REJECT
+- DOMAIN-SUFFIX,qianchuanghr.com,REJECT
+- DOMAIN-SUFFIX,qichexin.com,REJECT
+- DOMAIN-SUFFIX,qinchugudao.com,REJECT
+- DOMAIN-SUFFIX,quanliyouxi.cn,REJECT
+- DOMAIN-SUFFIX,qutaobi.com,REJECT
+- DOMAIN-SUFFIX,ry51w.cn,REJECT
+- DOMAIN-SUFFIX,sg536.cn,REJECT
+- DOMAIN-SUFFIX,sifubo.cn,REJECT
+- DOMAIN-SUFFIX,sifuce.cn,REJECT
+- DOMAIN-SUFFIX,sifuda.cn,REJECT
+- DOMAIN-SUFFIX,sifufu.cn,REJECT
+- DOMAIN-SUFFIX,sifuge.cn,REJECT
+- DOMAIN-SUFFIX,sifugu.cn,REJECT
+- DOMAIN-SUFFIX,sifuhe.cn,REJECT
+- DOMAIN-SUFFIX,sifuhu.cn,REJECT
+- DOMAIN-SUFFIX,sifuji.cn,REJECT
+- DOMAIN-SUFFIX,sifuka.cn,REJECT
+- DOMAIN-SUFFIX,smgru.net,REJECT
+- DOMAIN-SUFFIX,taoggou.com,REJECT
+- DOMAIN-SUFFIX,tcxshop.com,REJECT
+- DOMAIN-SUFFIX,tjqonline.cn,REJECT
+- DOMAIN-SUFFIX,topitme.com,REJECT
+- DOMAIN-SUFFIX,tt3sm4.cn,REJECT
+- DOMAIN-SUFFIX,tuia.cn,REJECT
+- DOMAIN-SUFFIX,tuipenguin.com,REJECT
+- DOMAIN-SUFFIX,tuitiger.com,REJECT
+- DOMAIN-SUFFIX,websd8.com,REJECT
+- DOMAIN-SUFFIX,wsgblw.com,REJECT
+- DOMAIN-SUFFIX,wx16999.com,REJECT
+- DOMAIN-SUFFIX,xchmai.com,REJECT
+- DOMAIN-SUFFIX,xiaohuau.xyz,REJECT
+- DOMAIN-SUFFIX,ygyzx.cn,REJECT
+- DOMAIN-SUFFIX,yinmong.com,REJECT
+- DOMAIN-SUFFIX,yitaopt.com,REJECT
+- DOMAIN-SUFFIX,yjqiqi.com,REJECT
+- DOMAIN-SUFFIX,yukhj.com,REJECT
+- DOMAIN-SUFFIX,zhaozecheng.cn,REJECT
+- DOMAIN-SUFFIX,zhenxinet.com,REJECT
+- DOMAIN-SUFFIX,zlne800.com,REJECT
+- DOMAIN-SUFFIX,zunmi.cn,REJECT
+- DOMAIN-SUFFIX,zzd6.com,REJECT
+- IP-CIDR,39.107.15.115/32,REJECT,no-resolve
+- IP-CIDR,47.89.59.182/32,REJECT,no-resolve
+- IP-CIDR,103.49.209.27/32,REJECT,no-resolve
+- IP-CIDR,123.56.152.96/32,REJECT,no-resolve
+- IP-CIDR,61.160.200.223/32,REJECT,no-resolve
+- IP-CIDR,61.160.200.242/32,REJECT,no-resolve
+- IP-CIDR,61.160.200.252/32,REJECT,no-resolve
+- IP-CIDR,61.174.50.214/32,REJECT,no-resolve
+- IP-CIDR,111.175.220.163/32,REJECT,no-resolve
+- IP-CIDR,111.175.220.164/32,REJECT,no-resolve
+- IP-CIDR,122.229.8.47/32,REJECT,no-resolve
+- IP-CIDR,122.229.29.89/32,REJECT,no-resolve
+- IP-CIDR,124.232.160.178/32,REJECT,no-resolve
+- IP-CIDR,175.6.223.15/32,REJECT,no-resolve
+- IP-CIDR,183.59.53.237/32,REJECT,no-resolve
+- IP-CIDR,218.93.127.37/32,REJECT,no-resolve
+- IP-CIDR,221.228.17.152/32,REJECT,no-resolve
+- IP-CIDR,221.231.6.79/32,REJECT,no-resolve
+- IP-CIDR,222.186.61.91/32,REJECT,no-resolve
+- IP-CIDR,222.186.61.95/32,REJECT,no-resolve
+- IP-CIDR,222.186.61.96/32,REJECT,no-resolve
+- IP-CIDR,222.186.61.97/32,REJECT,no-resolve
+- IP-CIDR,106.75.231.48/32,REJECT,no-resolve
+- IP-CIDR,119.4.249.166/32,REJECT,no-resolve
+- IP-CIDR,220.196.52.141/32,REJECT,no-resolve
+- IP-CIDR,221.6.4.148/32,REJECT,no-resolve
+- IP-CIDR,114.247.28.96/32,REJECT,no-resolve
+- IP-CIDR,221.179.131.72/32,REJECT,no-resolve
+- IP-CIDR,221.179.140.145/32,REJECT,no-resolve
+- IP-CIDR,10.72.25.0/24,REJECT,no-resolve
+- IP-CIDR,115.182.16.79/32,REJECT,no-resolve
+- IP-CIDR,118.144.88.126/32,REJECT,no-resolve
+- IP-CIDR,118.144.88.215/32,REJECT,no-resolve
+- IP-CIDR,118.144.88.216/32,REJECT,no-resolve
+- IP-CIDR,120.76.189.132/32,REJECT,no-resolve
+- IP-CIDR,124.14.21.147/32,REJECT,no-resolve
+- IP-CIDR,124.14.21.151/32,REJECT,no-resolve
+- IP-CIDR,180.166.52.24/32,REJECT,no-resolve
+- IP-CIDR,211.161.101.106/32,REJECT,no-resolve
+- IP-CIDR,220.115.251.25/32,REJECT,no-resolve
+- IP-CIDR,222.73.156.235/32,REJECT,no-resolve
+- DOMAIN-SUFFIX,kuaizip.com,REJECT
+- DOMAIN-SUFFIX,mackeeper.com,REJECT
+- DOMAIN-SUFFIX,zryydi.com,REJECT
+- DOMAIN-SUFFIX,flash.cn,REJECT
+- DOMAIN-SUFFIX,4009997658.com,REJECT
+- DOMAIN-SUFFIX,abbyychina.com,REJECT
+- DOMAIN-SUFFIX,bartender.cc,REJECT
+- DOMAIN-SUFFIX,betterzip.net,REJECT
+- DOMAIN-SUFFIX,betterzipcn.com,REJECT
+- DOMAIN-SUFFIX,beyondcompare.cc,REJECT
+- DOMAIN-SUFFIX,bingdianhuanyuan.cn,REJECT
+- DOMAIN-SUFFIX,chemdraw.com.cn,REJECT
+- DOMAIN-SUFFIX,cjmakeding.com,REJECT
+- DOMAIN-SUFFIX,cjmkt.com,REJECT
+- DOMAIN-SUFFIX,codesoftchina.com,REJECT
+- DOMAIN-SUFFIX,coreldrawchina.com,REJECT
+- DOMAIN-SUFFIX,crossoverchina.com,REJECT
+- DOMAIN-SUFFIX,dongmansoft.com,REJECT
+- DOMAIN-SUFFIX,earmasterchina.cn,REJECT
+- DOMAIN-SUFFIX,easyrecoverychina.com,REJECT
+- DOMAIN-SUFFIX,ediuschina.com,REJECT
+- DOMAIN-SUFFIX,flstudiochina.com,REJECT
+- DOMAIN-SUFFIX,formysql.com,REJECT
+- DOMAIN-SUFFIX,guitarpro.cc,REJECT
+- DOMAIN-SUFFIX,huishenghuiying.com.cn,REJECT
+- DOMAIN-SUFFIX,hypersnap.net,REJECT
+- DOMAIN-SUFFIX,iconworkshop.cn,REJECT
+- DOMAIN-SUFFIX,imindmap.cc,REJECT
+- DOMAIN-SUFFIX,jihehuaban.com.cn,REJECT
+- DOMAIN-SUFFIX,keyshot.cc,REJECT
+- DOMAIN-SUFFIX,kingdeecn.cn,REJECT
+- DOMAIN-SUFFIX,logoshejishi.com,REJECT
+- DOMAIN-SUFFIX,luping.net.cn,REJECT
+- DOMAIN-SUFFIX,mairuan.cn,REJECT
+- DOMAIN-SUFFIX,mairuan.com,REJECT
+- DOMAIN-SUFFIX,mairuan.com.cn,REJECT
+- DOMAIN-SUFFIX,mairuan.net,REJECT
+- DOMAIN-SUFFIX,mairuanwang.com,REJECT
+- DOMAIN-SUFFIX,makeding.com,REJECT
+- DOMAIN-SUFFIX,mathtype.cn,REJECT
+- DOMAIN-SUFFIX,mindmanager.cc,REJECT
+- DOMAIN-SUFFIX,mindmanager.cn,REJECT
+- DOMAIN-SUFFIX,mindmapper.cc,REJECT
+- DOMAIN-SUFFIX,mycleanmymac.com,REJECT
+- DOMAIN-SUFFIX,nicelabel.cc,REJECT
+- DOMAIN-SUFFIX,ntfsformac.cc,REJECT
+- DOMAIN-SUFFIX,ntfsformac.cn,REJECT
+- DOMAIN-SUFFIX,overturechina.com,REJECT
+- DOMAIN-SUFFIX,passwordrecovery.cn,REJECT
+- DOMAIN-SUFFIX,pdfexpert.cc,REJECT
+- DOMAIN-SUFFIX,photozoomchina.com,REJECT
+- DOMAIN-SUFFIX,shankejingling.com,REJECT
+- DOMAIN-SUFFIX,ultraiso.net,REJECT
+- DOMAIN-SUFFIX,vegaschina.cn,REJECT
+- DOMAIN-SUFFIX,xmindchina.net,REJECT
+- DOMAIN-SUFFIX,xshellcn.com,REJECT
+- DOMAIN-SUFFIX,yihuifu.cn,REJECT
+- DOMAIN-SUFFIX,qhres.com,DIRECT
+- DOMAIN-SUFFIX,qhimg.com,DIRECT
+- DOMAIN-SUFFIX,akadns.net,DIRECT
+- DOMAIN-SUFFIX,akamai.net,DIRECT
+- DOMAIN-SUFFIX,akamaiedge.net,DIRECT
+- DOMAIN-SUFFIX,akamaihd.net,DIRECT
+- DOMAIN-SUFFIX,akamaistream.net,DIRECT
+- DOMAIN-SUFFIX,akamaized.net,DIRECT
+- DOMAIN-SUFFIX,alibaba.com,DIRECT
+- DOMAIN-SUFFIX,alicdn.com,DIRECT
+- DOMAIN-SUFFIX,alikunlun.com,DIRECT
+- DOMAIN-SUFFIX,alipay.com,DIRECT
+- DOMAIN-SUFFIX,amap.com,DIRECT
+- DOMAIN-SUFFIX,autonavi.com,DIRECT
+- DOMAIN-SUFFIX,dingtalk.com,DIRECT
+- DOMAIN-SUFFIX,mxhichina.com,DIRECT
+- DOMAIN-SUFFIX,soku.com,DIRECT
+- DOMAIN-SUFFIX,taobao.com,DIRECT
+- DOMAIN-SUFFIX,tmall.com,DIRECT
+- DOMAIN-SUFFIX,tmall.hk,DIRECT
+- DOMAIN-SUFFIX,ykimg.com,DIRECT
+- DOMAIN-SUFFIX,youku.com,DIRECT
+- DOMAIN-SUFFIX,xiami.com,DIRECT
+- DOMAIN-SUFFIX,xiami.net,DIRECT
+- DOMAIN-SUFFIX,baidu.com,DIRECT
+- DOMAIN-SUFFIX,baidubcr.com,DIRECT
+- DOMAIN-SUFFIX,bdstatic.com,DIRECT
+- DOMAIN-SUFFIX,yunjiasu-cdn.net,DIRECT
+- DOMAIN-SUFFIX,acgvideo.com,DIRECT
+- DOMAIN-SUFFIX,biliapi.com,DIRECT
+- DOMAIN-SUFFIX,biliapi.net,DIRECT
+- DOMAIN-SUFFIX,bilibili.com,DIRECT
+- DOMAIN-SUFFIX,bilibili.tv,DIRECT
+- DOMAIN-SUFFIX,hdslb.com,DIRECT
+- DOMAIN-SUFFIX,blizzard.com,DIRECT
+- DOMAIN-SUFFIX,battle.net,DIRECT
+- DOMAIN,blzddist1-a.akamaihd.net,DIRECT
+- DOMAIN-SUFFIX,feiliao.com,DIRECT
+- DOMAIN-SUFFIX,pstatp.com,DIRECT
+- DOMAIN-SUFFIX,snssdk.com,DIRECT
+- DOMAIN-SUFFIX,iesdouyin.com,DIRECT
+- DOMAIN-SUFFIX,toutiao.com,DIRECT
+- DOMAIN-SUFFIX,cctv.com,DIRECT
+- DOMAIN-SUFFIX,cctvpic.com,DIRECT
+- DOMAIN-SUFFIX,livechina.com,DIRECT
+- DOMAIN-SUFFIX,didialift.com,DIRECT
+- DOMAIN-SUFFIX,didiglobal.com,DIRECT
+- DOMAIN-SUFFIX,udache.com,DIRECT
+- DOMAIN-SUFFIX,343480.com,DIRECT
+- DOMAIN-SUFFIX,baduziyuan.com,DIRECT
+- DOMAIN-SUFFIX,com-hs-hkdy.com,DIRECT
+- DOMAIN-SUFFIX,czybjz.com,DIRECT
+- DOMAIN-SUFFIX,dandanzan.com,DIRECT
+- DOMAIN-SUFFIX,fjhps.com,DIRECT
+- DOMAIN-SUFFIX,kuyunbo.club,DIRECT
+- DOMAIN-SUFFIX,21cn.com,DIRECT
+- DOMAIN-SUFFIX,hitv.com,DIRECT
+- DOMAIN-SUFFIX,mgtv.com,DIRECT
+- DOMAIN-SUFFIX,iqiyi.com,DIRECT
+- DOMAIN-SUFFIX,iqiyipic.com,DIRECT
+- DOMAIN-SUFFIX,71.am.com,DIRECT
+- DOMAIN-SUFFIX,jd.com,DIRECT
+- DOMAIN-SUFFIX,jd.hk,DIRECT
+- DOMAIN-SUFFIX,jdpay.com,DIRECT
+- DOMAIN-SUFFIX,360buyimg.com,DIRECT
+- DOMAIN-SUFFIX,iciba.com,DIRECT
+- DOMAIN-SUFFIX,ksosoft.com,DIRECT
+- DOMAIN-SUFFIX,meitu.com,DIRECT
+- DOMAIN-SUFFIX,meitudata.com,DIRECT
+- DOMAIN-SUFFIX,meitustat.com,DIRECT
+- DOMAIN-SUFFIX,meipai.com,DIRECT
+- DOMAIN-SUFFIX,duokan.com,DIRECT
+- DOMAIN-SUFFIX,mi-img.com,DIRECT
+- DOMAIN-SUFFIX,miui.com,DIRECT
+- DOMAIN-SUFFIX,miwifi.com,DIRECT
+- DOMAIN-SUFFIX,xiaomi.com,DIRECT
+- DOMAIN-SUFFIX,microsoft.com,DIRECT
+- DOMAIN-SUFFIX,msecnd.net,DIRECT
+- DOMAIN-SUFFIX,office365.com,DIRECT
+- DOMAIN-SUFFIX,outlook.com,DIRECT
+- DOMAIN-SUFFIX,s-microsoft.com,DIRECT
+- DOMAIN-SUFFIX,visualstudio.com,DIRECT
+- DOMAIN-SUFFIX,windows.com,DIRECT
+- DOMAIN-SUFFIX,windowsupdate.com,DIRECT
+- DOMAIN,officecdn-microsoft-com.akamaized.net,DIRECT
+- DOMAIN-SUFFIX,163.com,DIRECT
+- DOMAIN-SUFFIX,126.net,DIRECT
+- DOMAIN-SUFFIX,127.net,DIRECT
+- DOMAIN-SUFFIX,163yun.com,DIRECT
+- DOMAIN-SUFFIX,lofter.com,DIRECT
+- DOMAIN-SUFFIX,netease.com,DIRECT
+- DOMAIN-SUFFIX,ydstatic.com,DIRECT
+- DOMAIN-SUFFIX,sina.com,DIRECT
+- DOMAIN-SUFFIX,weibo.com,DIRECT
+- DOMAIN-SUFFIX,weibocdn.com,DIRECT
+- DOMAIN-SUFFIX,sohu.com,DIRECT
+- DOMAIN-SUFFIX,sohucs.com,DIRECT
+- DOMAIN-SUFFIX,sohu-inc.com,DIRECT
+- DOMAIN-SUFFIX,v-56.com,DIRECT
+- DOMAIN-SUFFIX,sogo.com,DIRECT
+- DOMAIN-SUFFIX,sogou.com,DIRECT
+- DOMAIN-SUFFIX,sogoucdn.com,DIRECT
+- DOMAIN-SUFFIX,steampowered.com,DIRECT
+- DOMAIN-SUFFIX,steam-chat.com,DIRECT
+- DOMAIN-SUFFIX,steamgames.com,DIRECT
+- DOMAIN-SUFFIX,steamusercontent.com,DIRECT
+- DOMAIN-SUFFIX,steamcontent.com,DIRECT
+- DOMAIN-SUFFIX,steamstatic.com,DIRECT
+- DOMAIN-SUFFIX,steamcdn-a.akamaihd.net,DIRECT
+- DOMAIN-SUFFIX,steamstat.us,DIRECT
+- DOMAIN-SUFFIX,gtimg.com,DIRECT
+- DOMAIN-SUFFIX,idqqimg.com,DIRECT
+- DOMAIN-SUFFIX,igamecj.com,DIRECT
+- DOMAIN-SUFFIX,myapp.com,DIRECT
+- DOMAIN-SUFFIX,myqcloud.com,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,servicewechat.com,DIRECT
+- DOMAIN-SUFFIX,tencent.com,DIRECT
+- DOMAIN-SUFFIX,tencent-cloud.net,DIRECT
+- DOMAIN-SUFFIX,tenpay.com,DIRECT
+- DOMAIN,file-igamecj.akamaized.net,DIRECT
+- IP-CIDR,182.254.116.0/24,DIRECT
+- IP-CIDR,203.205.252.0/23,DIRECT
+- IP-CIDR,203.205.254.0/23,DIRECT
+- DOMAIN-SUFFIX,jstucdn.com,DIRECT
+- DOMAIN-SUFFIX,zimuzu.io,DIRECT
+- DOMAIN-SUFFIX,zimuzu.tv,DIRECT
+- DOMAIN-SUFFIX,zmz2019.com,DIRECT
+- DOMAIN-SUFFIX,zmzapi.com,DIRECT
+- DOMAIN-SUFFIX,zmzapi.net,DIRECT
+- DOMAIN-SUFFIX,zmzfile.com,DIRECT
+- DOMAIN-SUFFIX,ccgslb.com,DIRECT
+- DOMAIN-SUFFIX,ccgslb.net,DIRECT
+- DOMAIN-SUFFIX,chinanetcenter.com,DIRECT
+- DOMAIN-SUFFIX,meixincdn.com,DIRECT
+- DOMAIN-SUFFIX,ourdvs.com,DIRECT
+- DOMAIN-SUFFIX,staticdn.net,DIRECT
+- DOMAIN-SUFFIX,wangsu.com,DIRECT
+- DOMAIN-SUFFIX,ipip.net,DIRECT
+- DOMAIN-SUFFIX,ip.la,DIRECT
+- DOMAIN-SUFFIX,ip-cdn.com,DIRECT
+- DOMAIN-SUFFIX,ipv6-test.com,DIRECT
+- DOMAIN-SUFFIX,test-ipv6.com,DIRECT
+- DOMAIN-SUFFIX,whatismyip.com,DIRECT
+- DOMAIN-SUFFIX,speedtest.net,DIRECT
+- DOMAIN-SUFFIX,netspeedtestmaster.com,DIRECT
+- DOMAIN,speedtest.macpaw.com,DIRECT
+- DOMAIN-SUFFIX,awesome-hd.me,DIRECT
+- DOMAIN-SUFFIX,broadcasthe.net,DIRECT
+- DOMAIN-SUFFIX,chdbits.co,DIRECT
+- DOMAIN-SUFFIX,classix-unlimited.co.uk,DIRECT
+- DOMAIN-SUFFIX,empornium.me,DIRECT
+- DOMAIN-SUFFIX,gazellegames.net,DIRECT
+- DOMAIN-SUFFIX,hdchina.org,DIRECT
+- DOMAIN-SUFFIX,hdsky.me,DIRECT
+- DOMAIN-SUFFIX,icetorrent.org,DIRECT
+- DOMAIN-SUFFIX,jpopsuki.eu,DIRECT
+- DOMAIN-SUFFIX,keepfrds.com,DIRECT
+- DOMAIN-SUFFIX,madsrevolution.net,DIRECT
+- DOMAIN-SUFFIX,m-team.cc,DIRECT
+- DOMAIN-SUFFIX,nanyangpt.com,DIRECT
+- DOMAIN-SUFFIX,ncore.cc,DIRECT
+- DOMAIN-SUFFIX,open.cd,DIRECT
+- DOMAIN-SUFFIX,ourbits.club,DIRECT
+- DOMAIN-SUFFIX,passthepopcorn.me,DIRECT
+- DOMAIN-SUFFIX,privatehd.to,DIRECT
+- DOMAIN-SUFFIX,redacted.ch,DIRECT
+- DOMAIN-SUFFIX,springsunday.net,DIRECT
+- DOMAIN-SUFFIX,tjupt.org,DIRECT
+- DOMAIN-SUFFIX,totheglory.im,DIRECT
+- DOMAIN-SUFFIX,acm.org,DIRECT
+- DOMAIN-SUFFIX,acs.org,DIRECT
+- DOMAIN-SUFFIX,aip.org,DIRECT
+- DOMAIN-SUFFIX,ams.org,DIRECT
+- DOMAIN-SUFFIX,annualreviews.org,DIRECT
+- DOMAIN-SUFFIX,aps.org,DIRECT
+- DOMAIN-SUFFIX,ascelibrary.org,DIRECT
+- DOMAIN-SUFFIX,asm.org,DIRECT
+- DOMAIN-SUFFIX,asme.org,DIRECT
+- DOMAIN-SUFFIX,astm.org,DIRECT
+- DOMAIN-SUFFIX,bmj.com,DIRECT
+- DOMAIN-SUFFIX,cambridge.org,DIRECT
+- DOMAIN-SUFFIX,cas.org,DIRECT
+- DOMAIN-SUFFIX,clarivate.com,DIRECT
+- DOMAIN-SUFFIX,ebscohost.com,DIRECT
+- DOMAIN-SUFFIX,emerald.com,DIRECT
+- DOMAIN-SUFFIX,engineeringvillage.com,DIRECT
+- DOMAIN-SUFFIX,icevirtuallibrary.com,DIRECT
+- DOMAIN-SUFFIX,ieee.org,DIRECT
+- DOMAIN-SUFFIX,imf.org,DIRECT
+- DOMAIN-SUFFIX,iop.org,DIRECT
+- DOMAIN-SUFFIX,jamanetwork.com,DIRECT
+- DOMAIN-SUFFIX,jhu.edu,DIRECT
+- DOMAIN-SUFFIX,jstor.org,DIRECT
+- DOMAIN-SUFFIX,karger.com,DIRECT
+- DOMAIN-SUFFIX,libguides.com,DIRECT
+- DOMAIN-SUFFIX,madsrevolution.net,DIRECT
+- DOMAIN-SUFFIX,mpg.de,DIRECT
+- DOMAIN-SUFFIX,myilibrary.com,DIRECT
+- DOMAIN-SUFFIX,nature.com,DIRECT
+- DOMAIN-SUFFIX,oecd-ilibrary.org,DIRECT
+- DOMAIN-SUFFIX,osapublishing.org,DIRECT
+- DOMAIN-SUFFIX,oup.com,DIRECT
+- DOMAIN-SUFFIX,ovid.com,DIRECT
+- DOMAIN-SUFFIX,oxfordartonline.com,DIRECT
+- DOMAIN-SUFFIX,oxfordbibliographies.com,DIRECT
+- DOMAIN-SUFFIX,oxfordmusiconline.com,DIRECT
+- DOMAIN-SUFFIX,pnas.org,DIRECT
+- DOMAIN-SUFFIX,proquest.com,DIRECT
+- DOMAIN-SUFFIX,rsc.org,DIRECT
+- DOMAIN-SUFFIX,sagepub.com,DIRECT
+- DOMAIN-SUFFIX,sciencedirect.com,DIRECT
+- DOMAIN-SUFFIX,sciencemag.org,DIRECT
+- DOMAIN-SUFFIX,scopus.com,DIRECT
+- DOMAIN-SUFFIX,siam.org,DIRECT
+- DOMAIN-SUFFIX,spiedigitallibrary.org,DIRECT
+- DOMAIN-SUFFIX,springer.com,DIRECT
+- DOMAIN-SUFFIX,springerlink.com,DIRECT
+- DOMAIN-SUFFIX,tandfonline.com,DIRECT
+- DOMAIN-SUFFIX,un.org,DIRECT
+- DOMAIN-SUFFIX,uni-bielefeld.de,DIRECT
+- DOMAIN-SUFFIX,webofknowledge.com,DIRECT
+- DOMAIN-SUFFIX,westlaw.com,DIRECT
+- DOMAIN-SUFFIX,wiley.com,DIRECT
+- DOMAIN-SUFFIX,worldbank.org,DIRECT
+- DOMAIN-SUFFIX,worldscientific.com,DIRECT
+- DOMAIN-SUFFIX,plex.tv,DIRECT
+- DOMAIN-SUFFIX,cn,DIRECT
+- DOMAIN-SUFFIX,360in.com,DIRECT
+- DOMAIN-SUFFIX,51ym.me,DIRECT
+- DOMAIN-SUFFIX,8686c.com,DIRECT
+- DOMAIN-SUFFIX,abchina.com,DIRECT
+- DOMAIN-SUFFIX,accuweather.com,DIRECT
+- DOMAIN-SUFFIX,aicoinstorge.com,DIRECT
+- DOMAIN-SUFFIX,air-matters.com,DIRECT
+- DOMAIN-SUFFIX,air-matters.io,DIRECT
+- DOMAIN-SUFFIX,aixifan.com,DIRECT
+- DOMAIN-SUFFIX,amd.com,DIRECT
+- DOMAIN-SUFFIX,b612.net,DIRECT
+- DOMAIN-SUFFIX,bdatu.com,DIRECT
+- DOMAIN-SUFFIX,beitaichufang.com,DIRECT
+- DOMAIN-SUFFIX,bjango.com,DIRECT
+- DOMAIN-SUFFIX,booking.com,DIRECT
+- DOMAIN-SUFFIX,bstatic.com,DIRECT
+- DOMAIN-SUFFIX,cailianpress.com,DIRECT
+- DOMAIN-SUFFIX,camera360.com,DIRECT
+- DOMAIN-SUFFIX,chinaso.com,DIRECT
+- DOMAIN-SUFFIX,chua.pro,DIRECT
+- DOMAIN-SUFFIX,chuimg.com,DIRECT
+- DOMAIN-SUFFIX,chunyu.mobi,DIRECT
+- DOMAIN-SUFFIX,chushou.tv,DIRECT
+- DOMAIN-SUFFIX,cmbchina.com,DIRECT
+- DOMAIN-SUFFIX,cmbimg.com,DIRECT
+- DOMAIN-SUFFIX,ctrip.com,DIRECT
+- DOMAIN-SUFFIX,dfcfw.com,DIRECT
+- DOMAIN-SUFFIX,docschina.org,DIRECT
+- DOMAIN-SUFFIX,douban.com,DIRECT
+- DOMAIN-SUFFIX,doubanio.com,DIRECT
+- DOMAIN-SUFFIX,douyu.com,DIRECT
+- DOMAIN-SUFFIX,dxycdn.com,DIRECT
+- DOMAIN-SUFFIX,dytt8.net,DIRECT
+- DOMAIN-SUFFIX,eastmoney.com,DIRECT
+- DOMAIN-SUFFIX,eudic.net,DIRECT
+- DOMAIN-SUFFIX,feng.com,DIRECT
+- DOMAIN-SUFFIX,fengkongcloud.com,DIRECT
+- DOMAIN-SUFFIX,frdic.com,DIRECT
+- DOMAIN-SUFFIX,futu5.com,DIRECT
+- DOMAIN-SUFFIX,futunn.com,DIRECT
+- DOMAIN-SUFFIX,gandi.net,DIRECT
+- DOMAIN-SUFFIX,geilicdn.com,DIRECT
+- DOMAIN-SUFFIX,getpricetag.com,DIRECT
+- DOMAIN-S
